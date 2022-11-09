@@ -71,6 +71,35 @@ app.get('/reviews', async (req, res) => {
             const reviews = await cursor.toArray();
             res.send(reviews);
 });
+app.get('/reviewsbyemail', async (req, res) => {
+    let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query).sort({_id:-1});
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+});
+app.patch('/reviwedit/:id', async (req, res) => {
+    const id = req.params.id;
+    const review = req.body.review
+    const query = { _id: ObjectId(id) }
+    const updatedDoc = {
+        $set:{
+            review: review
+        }
+    }
+    const result = await reviewCollection.updateOne(query, updatedDoc);
+    res.send(result);
+});
+app.delete('/reviewedelete/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await reviewCollection.deleteOne(query);
+    res.send(result);
+})
 }
 finally
 {
