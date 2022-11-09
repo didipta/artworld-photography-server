@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
@@ -26,18 +26,30 @@ try{
     let service
     if(size==3)
     {
-        const cursor=serviceCollection.find(query);
+        const cursor=serviceCollection.find(query).sort({_id:-1});
         service =await cursor.limit(3).toArray();
-        console.log(size);
+        
     }
     else
     {
-        const cursor=serviceCollection.find(query);
+        const cursor=serviceCollection.find(query).sort({_id:-1});
         service =await cursor.toArray();
     }
     
     res.send(service);
- })
+ });
+ app.get('/services/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const service = await serviceCollection.findOne(query);
+    res.send(service);
+});
+app.post("/services",async(req,res)=>
+{
+    const service=req.body;
+    const result=await serviceCollection.insertOne(service)
+    res.send(result);
+})
 }
 finally
 {
