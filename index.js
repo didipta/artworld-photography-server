@@ -21,6 +21,8 @@ try{
  const serviceCollection=client.db('Wedding_Photography').collection("Services");
  app.get('/services',async(req,res)=>{
     const size=req.query.size;
+    const page=parseInt(req.query.page);
+    const item=parseInt(req.query.item);
     const query={};
     
     let service
@@ -33,10 +35,11 @@ try{
     else
     {
         const cursor=serviceCollection.find(query).sort({_id:-1});
-        service =await cursor.toArray();
+        service =await cursor.skip(page*item).limit(item).toArray();
+        
     }
-    
-    res.send(service);
+    const count=await serviceCollection.estimatedDocumentCount();
+    res.send({count,service});
  });
  app.get('/services/:id', async (req, res) => {
     const id = req.params.id;
