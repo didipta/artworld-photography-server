@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const port=process.env.PORT || 5000;
-
+var jwt = require('jsonwebtoken');
 //midleware
 
 app.use(cors());
@@ -20,6 +20,12 @@ async function run(){
 try{
  const serviceCollection=client.db('Wedding_Photography').collection("Services");
  const reviewCollection=client.db('Wedding_Photography').collection("Reviews");
+
+ app.post('/jwt',(req,res)=>{
+    const user=res.body;
+    const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:"1h"})
+    res.send({token});
+ })
  app.get('/services',async(req,res)=>{
     const size=req.query.size;
     const page=parseInt(req.query.page);
